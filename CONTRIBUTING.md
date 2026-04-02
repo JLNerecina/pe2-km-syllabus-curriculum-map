@@ -49,4 +49,4 @@ update stuff
 
 We appreciate every contribution — let's build a great Knowledge Management project together!
 
-Last updated: 2026-03-31 by Project Manager
+Last updated: 2026-03-31 by Scrum Master
