@@ -15,6 +15,7 @@ Every major team decision is recorded here (as required in guideline Part 2.4).
 | 6 | 04/02/2026 | Approval of initial UI wireframes                  | Minimal style vs more complex UI            | PM + UX/UI Designer   | Approved the 4 submitted wireframes (Dashboard, Editor, Profile, Visualizer). Clean minimal design chosen as it best supports knowledge mapping visualization. |
 | 7 | 04/09/2026 | Start of Build Sprint 1 + approval of full sprint plan | Ad-hoc tasks vs structured sprint plan      | All members           | Approved detailed Sprint 1 & Sprint 2 plan with assignments and timeline. Developer will build core features while others work in parallel on their deliverables. |
 | 8 | 04/09/2026 | Final BPMN diagram assigned to KM Analyst          | Keep text-only BPMN vs add visual diagram   | All members           | Assigned final visual BPMN diagram (using Lucidchart) to KM Analyst (Eran Josh). This will complete the KM architecture deliverable. |
+| 9 | 04/09/2026 | Project scaffold completed and approved | Basic React/Next.js + Supabase setup vs other frameworks | All members (PM + Developer) | Scaffold is now complete and approved. Developer can immediately start Sprint 1 stories. This marks the official start of Build Sprint 1.
 
 **Next major decisions to be logged (already in To Do):**  
 - Final frontend framework confirmation  
