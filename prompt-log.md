@@ -170,6 +170,7 @@ To make the plan immediately actionable and ready to turn into GitHub Issues tod
 
 **What I learned / decided:**  
 Having a detailed sprint plan with clear ownership and deadlines makes coordination much easier as PM. Decided to turn every story into a GitHub Issue this week and link them to the Projects board.
+
 ---
 
 **Next entries will be added as I continue using AI for standup notes, presentation slides, or other SM tasks.**
