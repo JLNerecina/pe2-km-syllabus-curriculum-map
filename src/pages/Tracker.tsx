@@ -451,7 +451,7 @@ export default function Tracker() {
 
   return (
     <div className="p-8 pb-32">
-      <div className="max-w-[1280px] mx-auto relative">
+      <div className="w-full relative">
         <h1 className="text-3xl font-bold font-['Space_Grotesk'] mb-8">Curriculum Tracker</h1>
 
         {/* Warning Popover (Fixed Floating) */}
@@ -642,6 +642,10 @@ export default function Tracker() {
                         const isLocked = !wasTaken && missingPrereqs.length > 0;
                         const isInteractive = (!wasTaken || canRetake || isSelected) && !isTermCompleted && !isLocked;
 
+                        const isTakingCourse = studentCourses.some(sc => sc.course_id === course.id && sc.status === 'enrolled');
+                        // For styling, if it's taking course, but not actively selected in the current editable term
+                        const shouldShowTaking = isTakingCourse && (!isSelected || isTermCompleted);
+
                         return (
                             <div 
                                 key={course.id}
@@ -651,7 +655,7 @@ export default function Tracker() {
                                     }
                                 }}
                                 className={`p-4 rounded-xl border flex items-center gap-4 transition-all group relative ${
-                                    isSelected 
+                                    isSelected && !isTermCompleted
                                         ? 'bg-indigo-500/10 border-indigo-500 ring-2 ring-indigo-500/20' 
                                         : isLocked
                                             ? 'bg-slate-900/30 border-slate-800/50 opacity-40 grayscale-[0.5]'
@@ -685,6 +689,12 @@ export default function Tracker() {
                                             <span className="mt-1 text-[9px] font-black text-red-400 uppercase tracking-wider bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20 flex items-center gap-1.5 whitespace-nowrap shadow-[0_0_10px_rgba(239,68,68,0.1)]">
                                                 <span className="w-1 h-1 rounded-full bg-red-500 animate-pulse"></span>
                                                 Prerequisites not done
+                                            </span>
+                                        )}
+                                        {shouldShowTaking && !isLocked && (
+                                            <span className="mt-1 text-[9px] font-black text-blue-400 uppercase tracking-wider bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20 flex items-center gap-1.5 whitespace-nowrap shadow-[0_0_10px_rgba(59,130,246,0.1)]">
+                                                <span className="w-1 h-1 rounded-full bg-blue-500 animate-pulse"></span>
+                                                Currently Taking
                                             </span>
                                         )}
                                     </div>

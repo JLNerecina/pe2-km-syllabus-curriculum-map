@@ -100,7 +100,7 @@ export default function Map() {
 
   return (
     <div className="p-8 pb-32">
-      <div className="max-w-[1000px] mx-auto">
+      <div className="w-full">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold font-['Space_Grotesk']">Curriculum Map</h1>
           <button 
