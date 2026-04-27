@@ -131,7 +131,8 @@ export default function Map() {
               {[1, 2, 3, 4].map(year => {
                 const s1 = groupedCourses[`Y${year}S1`];
                 const s2 = groupedCourses[`Y${year}S2`];
-                if (!s1 && !s2) return null;
+                const s3 = groupedCourses[`Y${year}S3`];
+                if (!s1 && !s2 && !s3) return null;
 
                 return (
                   <div key={year} className="break-inside-avoid">
@@ -191,6 +192,29 @@ export default function Map() {
                         )}
                       </div>
                     </div>
+                    {/* Summer Semester */}
+                    {s3 && s3.length > 0 && (
+                      <div className="mt-6 border-t border-dashed border-[#e2e8f0] pt-6">
+                        <h4 className="text-sm font-bold text-[#64748b] mb-3 uppercase tracking-wider">Summer</h4>
+                        <div className="grid grid-cols-2 gap-6">
+                          {s3.map(course => (
+                            <div key={course.id} className="p-4 border border-[#e2e8f0] rounded-xl bg-[#f8fafc] mb-3 last:mb-0 break-inside-avoid">
+                              <div className="flex justify-between items-center gap-2 mb-1">
+                                <span className="font-bold text-[#1e293b] text-sm leading-tight">{course.code}</span>
+                                <span className={`inline-block px-2 h-5 leading-5 text-[10px] text-center rounded font-bold whitespace-nowrap ${
+                                  course.status === 'passed' ? 'bg-[#dcfce7] text-[#15803d]' : 
+                                  course.status === 'failed' ? 'bg-[#fee2e2] text-[#b91c1c]' : 
+                                  'bg-[#dbeafe] text-[#1d4ed8]'
+                                }`}>
+                                  {course.status === 'enrolled' ? 'TAKING' : course.status.toUpperCase()}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-[#64748b] leading-normal">{course.title}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
