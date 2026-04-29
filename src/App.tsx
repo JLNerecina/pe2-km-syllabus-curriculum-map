@@ -6,6 +6,8 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Tracker from './pages/Tracker';
 import Map from './pages/Map';
+import Monitor from './pages/Monitor';
+import ManageUsers from './pages/ManageUsers';
 
 function App() {
   return (
@@ -17,6 +19,16 @@ function App() {
           <Route path="/" element={<Navigate to="/tracker" replace />} />
           <Route path="/tracker" element={<Tracker />} />
           <Route path="/map" element={<Map />} />
+          
+          {/* Faculty, Admin, Superadmin only */}
+          <Route element={<ProtectedRoute allowedRoles={['faculty', 'admin', 'superadmin']} />}>
+            <Route path="/monitor" element={<Monitor />} />
+          </Route>
+
+          {/* Admin, Superadmin only */}
+          <Route element={<ProtectedRoute allowedRoles={['admin', 'superadmin']} />}>
+            <Route path="/manage-users" element={<ManageUsers />} />
+          </Route>
         </Route>
       </Route>
     </Routes>

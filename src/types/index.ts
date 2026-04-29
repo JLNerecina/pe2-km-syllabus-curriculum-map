@@ -1,9 +1,14 @@
-export type UserRole = 'student' | 'faculty' | 'admin';
+export type UserRole = 'student' | 'faculty' | 'admin' | 'superadmin';
 
 export interface UserProfile {
   id: string;
   email: string;
   role: UserRole;
+  name?: string;
+  id_number?: string;
+  department_id?: string;
+  can_edit_curriculum?: boolean;
+  program_id?: string;
   created_at: string;
 }
 
