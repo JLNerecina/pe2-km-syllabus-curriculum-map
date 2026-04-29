@@ -18,7 +18,9 @@ function App() {
         <Route element={<RootLayout />}>
           <Route path="/" element={<Navigate to="/tracker" replace />} />
           <Route path="/tracker" element={<Tracker />} />
+          <Route path="/tracker/:studentId" element={<Tracker />} />
           <Route path="/map" element={<Map />} />
+          <Route path="/map/:studentId" element={<Map />} />
           
           {/* Faculty, Admin, Superadmin only */}
           <Route element={<ProtectedRoute allowedRoles={['faculty', 'admin', 'superadmin']} />}>

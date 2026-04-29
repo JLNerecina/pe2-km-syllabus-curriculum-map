@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 // @ts-ignore
@@ -20,21 +21,42 @@ type AttainedCourse = Course & {
 };
 
 export default function Map() {
-  const { session } = useAuth();
-  const userId = session?.user?.id;
+  const { session, profile } = useAuth();
+  const { studentId } = useParams<{ studentId?: string }>();
+  const navigate = useNavigate();
 
-  const [attainedCourses, setAttainedCourses] = useState<AttainedCourse[]>([]);
-  const mapRef = useRef<HTMLDivElement>(null);
+  const isViewingOther = !!studentId && studentId !== session?.user?.id;
 
   useEffect(() => {
-    if (!userId) return;
+    if (isViewingOther && profile?.role === 'student') {
+      // Students cannot view other students' maps
+      navigate('/map', { replace: true });
+    }
+  }, [isViewingOther, profile, navigate]);
+
+  const targetUserId = isViewingOther ? studentId : session?.user?.id;
+
+  const [attainedCourses, setAttainedCourses] = useState<AttainedCourse[]>([]);
+  const [studentName, setStudentName] = useState<string | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+
+  // Fetch student name when viewing another student
+  useEffect(() => {
+    if (!isViewingOther || !studentId) return;
+    supabase.from('profiles').select('name').eq('id', studentId).single().then(({ data }) => {
+      if (data) setStudentName(data.name);
+    });
+  }, [isViewingOther, studentId]);
+
+  useEffect(() => {
+    if (!targetUserId) return;
 
     const fetchData = async () => {
       // 1. Fetch terms
       const { data: termsData } = await supabase
         .from('student_terms')
         .select('*')
-        .eq('student_id', userId)
+        .eq('student_id', targetUserId)
         .eq('status', 'completed');
         
       if (!termsData || termsData.length === 0) return;
@@ -73,7 +95,7 @@ export default function Map() {
     };
 
     fetchData();
-  }, [userId]);
+  }, [targetUserId]);
 
   const handleDownloadPdf = () => {
     const element = mapRef.current;
@@ -102,14 +124,27 @@ export default function Map() {
     <div className="p-8 pb-32">
       <div className="w-full">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold font-['Space_Grotesk']">Curriculum Map</h1>
-          <button 
-            onClick={handleDownloadPdf}
-            className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold transition-colors"
-          >
-            <span className="material-symbols-outlined text-sm">download</span>
-            Download PDF
-          </button>
+          <h1 className="text-3xl font-bold font-['Space_Grotesk']">
+            Curriculum Map{isViewingOther && studentName ? <span className="text-indigo-400"> — {studentName}</span> : ''}
+          </h1>
+          <div className="flex gap-4">
+            {isViewingOther && (
+              <button 
+                onClick={() => navigate(`/tracker/${studentId}`)}
+                className="flex items-center gap-2 border border-indigo-500 text-indigo-400 hover:bg-indigo-500/10 px-4 py-2 rounded-lg font-bold transition-colors"
+              >
+                <span className="material-symbols-outlined text-sm">edit</span>
+                Edit Tracker
+              </button>
+            )}
+            <button 
+              onClick={handleDownloadPdf}
+              className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold transition-colors"
+            >
+              <span className="material-symbols-outlined text-sm">download</span>
+              Download PDF
+            </button>
+          </div>
         </div>
 
         {/* The PDF Container */}

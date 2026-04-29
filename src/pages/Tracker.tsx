@@ -1,3 +1,4 @@
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
@@ -31,8 +32,32 @@ type CoursePrerequisite = {
 };
 
 export default function Tracker() {
-  const { session } = useAuth();
-  const userId = session?.user?.id;
+  const { session, profile } = useAuth();
+  const { studentId } = useParams<{ studentId?: string }>();
+  const navigate = useNavigate();
+  
+  // Determine target user. If studentId is present, we view that student's tracker.
+  // But only if the current user is faculty, admin, or superadmin.
+  const isViewingOther = !!studentId && studentId !== session?.user?.id;
+  
+  useEffect(() => {
+    if (isViewingOther && profile?.role === 'student') {
+      // Students cannot view other students' trackers
+      navigate('/tracker', { replace: true });
+    }
+  }, [isViewingOther, profile, navigate]);
+
+  const targetUserId = isViewingOther ? studentId : session?.user?.id;
+
+  const [studentName, setStudentName] = useState<string | null>(null);
+
+  // Fetch student name when viewing another student
+  useEffect(() => {
+    if (!isViewingOther || !studentId) return;
+    supabase.from('profiles').select('name').eq('id', studentId).single().then(({ data }) => {
+      if (data) setStudentName(data.name);
+    });
+  }, [isViewingOther, studentId]);
 
   const [activeYear, setActiveYear] = useState<number>(1);
   const [activeSem, setActiveSem] = useState<number>(1);
@@ -75,7 +100,7 @@ export default function Tracker() {
   }, [infoMessage]);
 
   const fetchData = useCallback(async () => {
-    if (!userId) return;
+    if (!targetUserId) return;
     
     // Fetch Courses
     const { data: coursesData } = await supabase.from('courses').select('*').order('year_level').order('semester');
@@ -89,7 +114,7 @@ export default function Tracker() {
     const { data: termsData } = await supabase
       .from('student_terms')
       .select('*')
-      .eq('student_id', userId)
+      .eq('student_id', targetUserId)
       .order('year_level')
       .order('semester');
     
@@ -107,7 +132,7 @@ export default function Tracker() {
     } else {
         setStudentCourses([]);
     }
-  }, [userId]);
+  }, [targetUserId]);
 
   useEffect(() => {
     fetchData();
@@ -326,7 +351,7 @@ export default function Tracker() {
   };
 
   const confirmEditTerm = async () => {
-    if (!activeTerm || !userId) return;
+    if (!activeTerm || !targetUserId) return;
 
     // Delete all terms that come AFTER the active term
     const termsToDelete = studentTerms.filter(t => 
@@ -346,7 +371,7 @@ export default function Tracker() {
   };
 
   const saveProgress = async () => {
-    if (!userId) return;
+    if (!targetUserId) return;
     
     if (totalUnits > 26 && !isOverloading) {
       setWarningMessage("Please accept the overload warning first.");
@@ -363,7 +388,7 @@ export default function Tracker() {
     const { data: termData, error: termError } = await supabase
       .from('student_terms')
       .upsert({
-        student_id: userId,
+        student_id: targetUserId,
         year_level: activeYear,
         semester: activeSem,
         is_overloaded: isOverloading,
@@ -435,7 +460,7 @@ export default function Tracker() {
   };
 
   const finalizeCurriculum = async () => {
-    if (!userId) return;
+    if (!targetUserId) return;
     
     // Find all 'enrolled' courses for this student and mark them 'passed'
     const termIds = studentTerms.map(t => t.id);
@@ -452,7 +477,9 @@ export default function Tracker() {
   return (
     <div className="p-8 pb-32">
       <div className="w-full relative">
-        <h1 className="text-3xl font-bold font-['Space_Grotesk'] mb-8">Curriculum Tracker</h1>
+        <h1 className="text-3xl font-bold font-['Space_Grotesk'] mb-8">
+          Curriculum Tracker{isViewingOther && studentName ? <span className="text-indigo-400"> — {studentName}</span> : ''}
+        </h1>
 
         {/* Warning Popover (Fixed Floating) */}
         {warningMessage && (

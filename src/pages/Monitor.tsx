@@ -22,9 +22,10 @@ export default function Monitor() {
   const { profile } = useAuth();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [selectedStudentStats, setSelectedStudentStats] = useState<{unitsPassed: number, unitsTaking: number, totalUnits: number} | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch overseen programs
@@ -78,27 +79,80 @@ export default function Monitor() {
         return;
       }
 
-      // For a real app, we would fetch student_terms to get their current year, GWA, and units.
-      // We will map over them and add some placeholder data based on their id
-      const enrichedStudents = (profilesData as Student[]).map(s => ({
-        ...s,
-        year_level: Math.floor(Math.random() * 4) + 1, // Placeholder
-        section: ['A', 'B', 'C'][Math.floor(Math.random() * 3)], // Placeholder
-        gwa: (1.0 + Math.random() * 1.5).toFixed(2) as unknown as number, // Placeholder 1.0 to 2.5
-        units_completed: Math.floor(Math.random() * 140), // Placeholder
-        total_units: 148,
-        status: 'Cleared'
-      }));
-
-      setStudents(enrichedStudents);
+      setStudents(profilesData as Student[]);
     }
     fetchStudents();
   }, [selectedProgramId]);
 
-  // Filter students by selected year
-  const filteredStudents = students.filter(s => 
-    selectedYear ? s.year_level === selectedYear : true
-  );
+  // Fetch accurate stats when student is selected
+  useEffect(() => {
+    async function fetchStats() {
+      if (!selectedStudent) {
+        setSelectedStudentStats(null);
+        return;
+      }
+      
+      // Fetch courses for the program
+      const { data: coursesData } = await supabase.from('courses').select('*').eq('program_id', selectedStudent.program_id);
+      
+      // Fetch student terms
+      const { data: termsData } = await supabase.from('student_terms').select('*').eq('student_id', selectedStudent.id);
+      
+      // Fetch student courses
+      let stdCoursesData: any[] = [];
+      if (termsData && termsData.length > 0) {
+        const termIds = termsData.map((t: any) => t.id);
+        const { data: scData } = await supabase.from('student_courses').select('*').in('student_term_id', termIds);
+        if (scData) stdCoursesData = scData;
+      }
+      
+      const courses = coursesData || [];
+      const terms = termsData || [];
+      const stdCourses = stdCoursesData;
+      
+      let totalUnits = 0;
+      let unitsCompleted = 0;
+      
+      const uniqueCoursesUnits = courses.reduce((acc, course) => acc + (course.units || 0), 0);
+      
+      const failedUnits = stdCourses.reduce((acc, sc) => {
+        if (sc.status === 'failed') {
+          const c = courses.find(course => course.id === sc.course_id);
+          return acc + (c?.units || 0);
+        }
+        return acc;
+      }, 0);
+      
+      totalUnits = uniqueCoursesUnits + failedUnits;
+      
+      const unitsPassed = stdCourses.reduce((acc, sc) => {
+        if (sc.status === 'passed') {
+          const c = courses.find(course => course.id === sc.course_id);
+          return acc + (c?.units || 0);
+        }
+        return acc;
+      }, 0);
+      
+      const unitsTaking = stdCourses.reduce((acc, sc) => {
+        if (sc.status === 'enrolled') {
+          const c = courses.find(course => course.id === sc.course_id);
+          return acc + (c?.units || 0);
+        }
+        return acc;
+      }, 0);
+      
+      setSelectedStudentStats({ unitsPassed, unitsTaking, totalUnits });
+    }
+    
+    fetchStats();
+  }, [selectedStudent]);
+
+  // Filter students by search query
+  const filteredStudents = students.filter(s => {
+    if (!searchQuery) return true;
+    return s.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      s.id_number?.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   if (isLoading) {
     return (
@@ -121,87 +175,64 @@ export default function Monitor() {
       {/* Drill-down Interface */}
       <div className="grid grid-cols-12 gap-gutter">
         {/* Left Column: Navigation Hierarchy */}
-        <div className="col-span-12 lg:col-span-4 space-y-4">
+        <div className="col-span-12 lg:col-span-4 flex flex-col gap-4 h-full min-h-[500px]">
           
           {/* Programs Section */}
           <div className="glass-card rounded-xl p-4">
             <div className="flex items-center justify-between mb-4">
               <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 font-label-sm">
-                Academic Programs
+                Academic Program
               </span>
-              <span className="text-xs text-slate-500">{programs.length} Active</span>
             </div>
-            <div className="space-y-2">
-              {programs.map(program => (
-                <button 
-                  key={program.id}
-                  onClick={() => {
-                    setSelectedProgramId(program.id);
-                    setSelectedYear(null);
+            {programs.length > 0 ? (
+              <div className="relative">
+                <select
+                  value={selectedProgramId || ''}
+                  onChange={(e) => {
+                    setSelectedProgramId(e.target.value);
                     setSelectedStudent(null);
                   }}
-                  className={`w-full flex items-center justify-between p-3 rounded-lg transition-all ${
-                    selectedProgramId === program.id 
-                      ? 'bg-indigo-500/20 border border-indigo-500/30 text-indigo-100 group' 
-                      : 'hover:bg-surface-variant/50 border border-transparent text-slate-400 hover:text-slate-200'
-                  }`}
+                  className="w-full bg-surface-variant/50 border border-indigo-500/30 rounded-lg p-3 text-sm text-slate-200 outline-none focus:border-indigo-500 transition-colors appearance-none pr-10 cursor-pointer"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-indigo-400">
-                      {program.code.includes('CS') ? 'computer' : 'settings_input_component'}
-                    </span>
-                    <span className="font-medium">{program.name}</span>
-                  </div>
-                  <span className={`material-symbols-outlined transition-transform ${selectedProgramId === program.id ? 'text-indigo-400 translate-x-1' : ''}`}>
-                    chevron_right
-                  </span>
-                </button>
-              ))}
-              {programs.length === 0 && (
-                <p className="text-sm text-slate-500 text-center py-4">No programs assigned.</p>
-              )}
-            </div>
-          </div>
-
-          {/* Year Levels */}
-          {selectedProgramId && (
-            <div className="glass-card rounded-xl p-4 border-l-4 border-l-indigo-500">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-bold uppercase tracking-widest text-indigo-400 font-label-sm">
-                  Year Levels
+                  {programs.map(p => (
+                    <option key={p.id} value={p.id} className="bg-slate-900 text-slate-200">
+                      {p.code} - {p.name}
+                    </option>
+                  ))}
+                </select>
+                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-indigo-400 pointer-events-none">
+                  expand_more
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {[1, 2, 3, 4].map(year => (
-                  <button 
-                    key={year}
-                    onClick={() => {
-                      setSelectedYear(selectedYear === year ? null : year);
-                      setSelectedStudent(null);
-                    }}
-                    className={`p-3 rounded-lg transition-all text-center ${
-                      selectedYear === year 
-                        ? 'bg-indigo-500/20 border border-indigo-500/40 text-indigo-100 font-bold'
-                        : 'bg-surface-container-high border border-indigo-500/10 text-slate-400 hover:text-indigo-300'
-                    }`}
-                  >
-                    Year {year}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-sm text-slate-500 text-center py-4">No programs assigned.</p>
+            )}
+          </div>
+
+
 
           {/* Students List */}
-          {(selectedProgramId || selectedYear) && (
-            <div className="glass-card rounded-xl p-4 border-l-4 border-l-cyan-500 max-h-[400px] overflow-y-auto">
+          {selectedProgramId && (
+            <div className="glass-card rounded-xl p-4 border-l-4 border-l-cyan-500 flex flex-col flex-1 min-h-0">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-bold uppercase tracking-widest text-cyan-400 font-label-sm">
-                  Students {selectedYear ? `(Year ${selectedYear})` : ''}
+                  Students
                 </span>
                 <span className="text-xs text-slate-500">{filteredStudents.length} Students</span>
               </div>
-              <div className="space-y-2">
+              <div className="mb-4">
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+                  <input 
+                    type="search" 
+                    placeholder="Search by name or ID..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-surface-variant/30 border border-indigo-500/20 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-200 outline-none focus:border-cyan-500 transition-colors"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2 flex-1 overflow-y-auto pr-2 custom-scrollbar">
                 {filteredStudents.map(student => (
                   <button 
                     key={student.id}
@@ -216,7 +247,6 @@ export default function Monitor() {
                       <div className="text-sm">{student.name}</div>
                       <div className="text-xs opacity-60 font-mono mt-1">{student.id_number || 'No ID'}</div>
                     </div>
-                    <span className="text-xs opacity-60">Year {student.year_level}-{student.section}</span>
                   </button>
                 ))}
                 {filteredStudents.length === 0 && (
@@ -254,32 +284,36 @@ export default function Monitor() {
                         </span>
                       </div>
                       <p className="text-slate-400 text-sm mb-4">
-                        Student ID: <span className="text-indigo-300 font-mono">{selectedStudent.id_number || 'N/A'}</span> • {programs.find(p => p.id === selectedStudent.program_id)?.code || 'Program'} • Year {selectedStudent.year_level}
+                        Student ID: <span className="text-indigo-300 font-mono">{selectedStudent.id_number || 'N/A'}</span> • {programs.find(p => p.id === selectedStudent.program_id)?.code || 'Program'}
                       </p>
                       
-                      <div className="grid grid-cols-3 gap-4 mb-6">
-                        <div className="bg-surface-container-low rounded-lg p-3 border border-indigo-500/5">
-                          <p className="text-[10px] uppercase tracking-tighter text-slate-500 mb-1">Gen. Weighted Avg</p>
-                          <p className="text-xl font-bold text-indigo-400">{selectedStudent.gwa}</p>
+                      <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="bg-surface-container-low rounded-lg p-4 border border-indigo-500/5">
+                          <p className="text-[10px] uppercase tracking-tighter text-slate-500 mb-1">Units Passed</p>
+                          {selectedStudentStats ? (
+                            <p className="text-2xl font-bold text-green-400">{selectedStudentStats.unitsPassed} <span className="text-sm text-slate-500 font-normal">/ {selectedStudentStats.totalUnits}</span></p>
+                          ) : (
+                            <p className="text-sm text-slate-400 animate-pulse">Calculating...</p>
+                          )}
                         </div>
-                        <div className="bg-surface-container-low rounded-lg p-3 border border-indigo-500/5">
-                          <p className="text-[10px] uppercase tracking-tighter text-slate-500 mb-1">Units Completed</p>
-                          <p className="text-xl font-bold text-indigo-400">{selectedStudent.units_completed} <span className="text-xs text-slate-500">/ {selectedStudent.total_units}</span></p>
-                        </div>
-                        <div className="bg-surface-container-low rounded-lg p-3 border border-indigo-500/5">
-                          <p className="text-[10px] uppercase tracking-tighter text-slate-500 mb-1">Status</p>
-                          <p className="text-xl font-bold text-green-400">{selectedStudent.status}</p>
+                        <div className="bg-surface-container-low rounded-lg p-4 border border-indigo-500/5">
+                          <p className="text-[10px] uppercase tracking-tighter text-slate-500 mb-1">Units Taking</p>
+                          {selectedStudentStats ? (
+                            <p className="text-2xl font-bold text-cyan-400">{selectedStudentStats.unitsTaking}</p>
+                          ) : (
+                            <p className="text-sm text-slate-400 animate-pulse">Calculating...</p>
+                          )}
                         </div>
                       </div>
 
                       <div className="flex items-center gap-4">
-                        <button className="spectral-gradient text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-indigo-500/20 hover:opacity-90 transition-all flex items-center gap-2 group">
-                          <span className="material-symbols-outlined text-sm">grid_view</span>
-                          View Curriculum Grid
+                        <button 
+                          onClick={() => window.open(`/map/${selectedStudent.id}`, '_blank')}
+                          className="spectral-gradient text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-indigo-500/20 hover:opacity-90 transition-all flex items-center gap-2 group"
+                        >
+                          <span className="material-symbols-outlined text-sm">map</span>
+                          Curriculum Map
                           <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                        </button>
-                        <button className="border border-indigo-500/30 text-indigo-400 px-6 py-3 rounded-xl font-bold text-sm hover:bg-indigo-500/5 transition-all">
-                          Download Record
                         </button>
                       </div>
                     </div>
@@ -293,76 +327,26 @@ export default function Monitor() {
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-indigo-300">Degree Completion</span>
                       <span className="text-xs text-indigo-300">
-                        {Math.round(((selectedStudent.units_completed || 0) / (selectedStudent.total_units || 1)) * 100)}%
+                        {selectedStudentStats && selectedStudentStats.totalUnits > 0 ? Math.round(((selectedStudentStats.unitsPassed || 0) / (selectedStudentStats.totalUnits || 1)) * 100) : 0}%
                       </span>
                     </div>
                     <div className="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
                       <div 
-                        className="spectral-gradient h-full rounded-full" 
-                        style={{ width: `${Math.round(((selectedStudent.units_completed || 0) / (selectedStudent.total_units || 1)) * 100)}%` }}
+                        className="spectral-gradient h-full rounded-full transition-all duration-1000" 
+                        style={{ width: `${selectedStudentStats && selectedStudentStats.totalUnits > 0 ? Math.round(((selectedStudentStats.unitsPassed || 0) / (selectedStudentStats.totalUnits || 1)) * 100) : 0}%` }}
                       ></div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Placeholder for Curriculum Grid Preview */}
-              <div className="glass-card rounded-2xl p-8 mt-6">
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <h3 className="font-headline-md text-on-surface">Curriculum Compliance Matrix</h3>
-                    <p className="text-sm text-slate-500">Read-only view of academic milestones and prerequisites.</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase">
-                      <span className="w-2 h-2 rounded-full bg-green-500"></span> Passed
-                    </div>
-                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase">
-                      <span className="w-2 h-2 rounded-full bg-indigo-500"></span> In Progress
-                    </div>
-                    <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase">
-                      <span className="w-2 h-2 rounded-full bg-surface-variant border border-white/10"></span> Pending
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-8">
-                  {/* Simulated Grid Data based on HTML */}
-                  <section>
-                    <h4 className="text-xs font-bold text-indigo-400 uppercase mb-4 pb-2 border-b border-indigo-500/10">Year 1 - Foundational</h4>
-                    <div className="curriculum-grid">
-                      <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-                        <p className="text-[10px] text-green-400 font-bold mb-1">CS 101</p>
-                        <p className="text-xs font-medium leading-tight text-white">Intro to Computing</p>
-                      </div>
-                      <div className="p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-                        <p className="text-[10px] text-green-400 font-bold mb-1">CS 102</p>
-                        <p className="text-xs font-medium leading-tight text-white">Comp. Programming I</p>
-                      </div>
-                    </div>
-                  </section>
-                  <section>
-                    <h4 className="text-xs font-bold text-indigo-400 uppercase mb-4 pb-2 border-b border-indigo-500/10">Year 3 - Advanced (Active)</h4>
-                    <div className="curriculum-grid">
-                      <div className="p-3 bg-indigo-500/20 border border-indigo-500/40 rounded-lg ring-1 ring-indigo-500 ring-offset-2 ring-offset-surface">
-                        <p className="text-[10px] text-indigo-300 font-bold mb-1">CS 301</p>
-                        <p className="text-xs font-medium leading-tight text-white">Algorithms</p>
-                      </div>
-                      <div className="p-3 bg-surface-container-highest border border-white/5 rounded-lg opacity-60">
-                        <p className="text-[10px] text-slate-400 font-bold mb-1">CS 303</p>
-                        <p className="text-xs font-medium leading-tight text-white">Software Engr I</p>
-                      </div>
-                    </div>
-                  </section>
-                </div>
-              </div>
             </>
           ) : (
             <div className="glass-card rounded-2xl p-12 flex flex-col items-center justify-center text-center h-[400px]">
               <span className="material-symbols-outlined text-6xl text-indigo-500/20 mb-4">search</span>
               <h3 className="text-xl font-bold text-indigo-300 mb-2">No Student Selected</h3>
               <p className="text-slate-400 max-w-sm">
-                Select a program, year level, and a student from the sidebar to view their full academic progress and curriculum compliance matrix.
+                Select a program and a student from the sidebar to view their full academic progress.
               </p>
             </div>
           )}

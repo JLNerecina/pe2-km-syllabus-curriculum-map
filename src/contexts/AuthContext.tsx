@@ -65,8 +65,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setProfile(null);
       }
       
-      // If this page was opened as a popup and we are now logged in, close the popup.
-      if (session && window.opener) {
+      // If this page was opened as an OAuth popup callback, close the popup.
+      // Only close if the URL contains an auth callback hash, not for general new tabs.
+      if (session && window.opener && window.location.hash.includes('access_token')) {
         window.close();
       }
     });
