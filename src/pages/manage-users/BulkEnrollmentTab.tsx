@@ -56,6 +56,14 @@ export default function BulkEnrollmentTab({ programs, departments }: Props) {
       return;
     }
 
+    // Check for duplicate emails within the batch
+    const emails = validRows.map(r => r.email.trim());
+    const uniqueEmails = new Set(emails);
+    if (uniqueEmails.size !== emails.length) {
+      setFeedback({ type: 'error', message: 'Duplicate email addresses found in your rows. Each email must be unique.' });
+      return;
+    }
+
     setIsSubmitting(true);
     const insertData = validRows.map(r => ({
       email: r.email.trim(),
@@ -72,6 +80,24 @@ export default function BulkEnrollmentTab({ programs, departments }: Props) {
     if (error) {
       setFeedback({ type: 'error', message: `Enrollment failed: ${error.message}` });
     } else {
+      // Log bulk enrollment as a single summary audit entry
+      await supabase.from('audit_logs').insert({
+        actor_id: profile?.id,
+        action: 'bulk_enrollment.create',
+        target_table: 'preauthorized_users',
+        target_id: selectedProgramId,
+        target_label: selectedProgram?.code || 'Unknown Program',
+        metadata: {
+          count: validRows.length,
+          program: selectedProgram?.name,
+          program_code: selectedProgram?.code,
+          students: validRows.map(r => ({
+            id_number: r.studentNumber.trim() || null,
+            name: r.fullName.trim() || null,
+            email: r.email.trim()
+          }))
+        },
+      });
       setFeedback({ type: 'success', message: `Successfully pre-authorized ${validRows.length} student${validRows.length > 1 ? 's' : ''}.` });
       setRows(Array.from({ length: 5 }, makeRow));
     }
