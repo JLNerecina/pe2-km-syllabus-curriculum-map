@@ -1,42 +1,64 @@
-# Knowledge Mapping App
+# PE2-KM-Syllabus-Curriculum-Map
 
-This application visualizes academic program connections, including course prerequisites, skills, and knowledge progression. Below are the technical stack considerations detailing what technologies are used, their purpose, and why they were chosen for this specific application.
+## KM Analyst Branch — EranJosh
 
-## Tech Stack Considerations
+This branch contains all Knowledge Management deliverables for the **CICS Curriculum Map System**, covering the Discovery phase through the Final Review.
 
-### Frontend Framework: React (v19)
-* **Purpose:** Core library for building the user interface.
-* **Why it's used:** React provides a robust component-based architecture which is ideal for a complex mapping and visualization tool. It allows for reusable UI elements (like course nodes and connections), efficient rendering of dynamic content, and has a vast ecosystem of libraries that map nicely to our requirements (like visualization and routing).
+---
 
-### Build Tool & Dev Server: Vite (v8)
-* **Purpose:** Serves the app locally during development and bundles it for production.
-* **Why it's used:** Vite is incredibly fast compared to traditional bundlers like Webpack. It provides an instant startup time and lightning-fast Hot Module Replacement (HMR). This significantly improves the developer experience and shortens the feedback loop when tweaking UI components or visualization logic.
+### KM Deliverables
 
-### Programming Language: TypeScript
-* **Purpose:** Adds static typing to pure JavaScript.
-* **Why it's used:** In an application tracking complex data models (like nodes, edges, curricula, and user roles), TypeScript helps prevent runtime errors by enforcing strict data structures. It vastly improves code maintainability, refactoring confidence, and editor autocompletion.
+| Document | Description | Phase |
+|----------|-------------|-------|
+| [km-report.md](docs/km-report.md) | Problem statement, user/business goals, SECI framework proposal, assumptions and open questions | Discovery (Week 2) |
+| [km-architecture.md](docs/km-architecture.md) | KM architecture overview, role-based access matrix, and BPMN process descriptions | Discovery (Week 2) |
+| [BPMN Diagram V1.0.jpeg](docs/BPMN%20Diagram%20V1.0.jpeg) | Finalized BPMN process diagram (Lucidchart) — 5 role-based swim lanes covering Student, Faculty, Admin, Super Admin, and System | Sprint 1 (Week 5) |
+| [km-mapping-sprint1.md](docs/km-mapping-sprint1.md) | SECI framework mapping for Sprint 1 features (Authentication & Login Flow) with gap analysis | Sprint 1 Review (Week 6) |
+| [km-mapping-sprint2.md](docs/km-mapping-sprint2.md) | SECI framework mapping for Sprint 2 features (Core Functionalities) with gap analysis | Sprint 2 Review |
+| [km-final-review.md](docs/km-final-review.md) | Final review — App vs. SECI Framework: comprehensive mapping table, gap analysis, and recommendations for Developer and Designer | Final Review |
+| [prompt-log.md](prompt-log.md) | AI prompt documentation (3 entries covering Weeks 2, 5, and 6+) | Ongoing |
 
-### Styling: Tailwind CSS (v4)
-* **Purpose:** Utility-first CSS framework for styling the application.
-* **Why it's used:** Tailwind allows for rapid UI development by applying utility classes directly to HTML/JSX elements. It enforces a consistent design system (colors, spacing, typography) out of the box and prevents bloated, hard-to-maintain custom CSS files, making it easier to keep the design cohesive across the entire platform.
+---
 
-### Routing: React Router DOM (v7)
-* **Purpose:** Handles client-side navigation.
-* **Why it's used:** It is the industry standard for React applications to manage navigation between different views (e.g., dashboard, curriculum maps, user profiles, settings) without triggering full page reloads. This provides a smooth, fast, app-like user experience.
+### Framework Used: SECI Model (Nonaka & Takeuchi)
 
-### Backend & Database: Supabase
-* **Purpose:** Backend-as-a-Service providing a PostgreSQL database, authentication, and API layer.
-* **Why it's used:** Supabase provides a full relational PostgreSQL database which is perfectly suited for the deeply relational nature of a Knowledge Map (e.g., courses relating to skills, handling multiple pre-requisites). It also provides out-of-the-box user authentication and row-level security (RLS), allowing us to efficiently manage access controls for Students, Faculty, and Admins without needing to build and maintain a custom backend server from scratch.
+The SECI model was selected as the KM framework for this project. It describes four modes of knowledge conversion:
 
-## Getting Started
+| Mode | Direction | In Our System |
+|------|-----------|---------------|
+| **Socialization** | Tacit → Tacit | Faculty discussions, standup notes (not yet in-app) |
+| **Externalization** | Tacit → Explicit | Admin enrollment forms, user management, course-prerequisite data |
+| **Combination** | Explicit → Explicit | Curriculum map visualization, prerequisite validation engine, audit trail |
+| **Internalization** | Explicit → Tacit | Students exploring the curriculum map, checking courses, discovering prerequisites |
 
-To run the application locally:
+---
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
+### Key Findings (Final Review)
+
+**Strongest area:** Combination — the curriculum map visualization is the system's core knowledge artifact, combining courses, prerequisites, and student progress into one interactive view.
+
+**Main gap:** Socialization — the app manages explicit knowledge well but does not yet facilitate informal knowledge sharing between users. Recommended adding course-level comments/notes so faculty can explain *why* prerequisites exist.
+
+**Overall coverage:** 3 out of 4 SECI modes implemented.
+
+---
+
+### Related Issues
+
+| Issue | Title | Status |
+|-------|-------|--------|
+| #27 | Upload the finalized BPMN Diagram | Done |
+| #31 | Framework mapping review for Sprint 1 | Done |
+| #55 | Framework mapping review for Sprint 2 | Done |
+| #56 | Final Review — App vs. Framework | Done |
+| #18 | Update prompt-log.md | Done |
+
+---
+
+### Project Info
+
+**Project:** CICS Curriculum Map System
+**Domain:** College of Informatics and Computing Studies (BSCS, BSIT, BSIS, BSEMC)
+**Tech Stack:** Supabase + Vercel + React/Tailwind
+**Role:** KM (Knowledge Management) Analyst
+**Team Lead:** JLNerecina
