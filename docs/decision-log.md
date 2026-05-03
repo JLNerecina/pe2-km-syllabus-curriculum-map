@@ -17,6 +17,7 @@ Every major team decision is recorded here (as required in guideline Part 2.4).
 | 8 | 04/09/2026 | Final BPMN diagram assigned to KM Analyst          | Keep text-only BPMN vs add visual diagram   | All members           | Assigned final visual BPMN diagram (using Lucidchart) to KM Analyst (Eran Josh). This will complete the KM architecture deliverable. |
 | 9 | 04/09/2026 | Project scaffold completed and approved | Basic React/Next.js + Supabase setup vs other frameworks | All members (PM + Developer) | Scaffold is now complete and approved. Developer can immediately start Sprint 1 stories. This marks the official start of Build Sprint 1. |
 |10 | 04/09/2026 | QA & Docs Lead completed CONTRIBUTING.md and CHANGELOG.md | Ad-hoc documentation vs structured guideline-compliant docs | All members | CONTRIBUTING.md and CHANGELOG.md are now in place as required by the guideline. |
+| 11 | 04/15/2026 | Start of Build Sprint 1 (Authentication & Log-in Flow) | Continuing with previous plan vs re-scoping | All members | Officially started Sprint 1. Developer has begun implementing core auth features. |
 
 **Next major decisions to be logged (already in To Do):**  
 - Final frontend framework confirmation  
