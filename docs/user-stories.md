@@ -84,43 +84,43 @@ Features integrated into the `dev` branch. QA Lead begins testing. Bug reports f
 
 | TC ID     | Linked US | Description                                                                 | Test File                        | Status          |
 |-----------|-----------|-----------------------------------------------------------------------------|----------------------------------|-----------------|
-| TC-S2-01  | US-06     | Dashboard renders all year level and semester containers correctly          | `StudentDashboard.test.tsx`      | 🔲 Not Started  |
-| TC-S2-02  | US-10     | Semester "Select All" checkbox checks all unlocked courses in that semester | `StudentDashboard.test.tsx`      | 🔲 Not Started  |
-| TC-S2-03  | US-10     | Semester "Select All" does not check locked (prerequisite-blocked) courses  | `StudentDashboard.test.tsx`      | 🔲 Not Started  |
-| TC-S2-04  | US-09     | Tapping a course card opens the prerequisite detail modal                   | `StudentDashboard.test.tsx`      | 🔲 Not Started  |
-| TC-S2-05  | US-09     | Modal displays correct prerequisites and unlockable courses for a course    | `StudentDashboard.test.tsx`      | 🔲 Not Started  |
-| TC-S2-06  | US-07     | Checking a completed course persists the update to Supabase                 | `Tracker.test.tsx`               | 🔲 Not Started  |
+| TC-S2-01  | US-06     | Dashboard renders all year level and semester containers correctly          | `StudentDashboard.test.tsx`      |  ✅ Pass        |
+| TC-S2-02  | US-10     | Semester "Select All" checkbox checks all unlocked courses in that semester | `StudentDashboard.test.tsx`      | ✅ Pass         |
+| TC-S2-03  | US-10     | Semester "Select All" does not check locked (prerequisite-blocked) courses  | `StudentDashboard.test.tsx`      | ✅ Pass         |
+| TC-S2-04  | US-09     | Tapping a course card opens the prerequisite detail modal                   | `StudentDashboard.test.tsx`      | ✅ Pass         |
+| TC-S2-05  | US-09     | Modal displays correct prerequisites and unlockable courses for a course    | `StudentDashboard.test.tsx`      | ✅ Pass         |
+| TC-S2-06  | US-07     | Checking a completed course persists the update to Supabase                 | `Tracker.test.tsx`               | ✅ Pass         |
 
 #### Module B — Faculty Dashboard
 
 | TC ID     | Linked US | Description                                                                 | Test File                        | Status          |
 |-----------|-----------|-----------------------------------------------------------------------------|----------------------------------|-----------------|
-| TC-S2-07  | US-11     | Faculty dashboard shows only programs with assigned students                | `FacultyDashboard.test.tsx`      | 🔲 Not Started  |
-| TC-S2-08  | US-11     | Tapping a program reveals only assigned year levels                         | `FacultyDashboard.test.tsx`      | 🔲 Not Started  |
-| TC-S2-09  | US-11     | Tapping a year level reveals only assigned sections                         | `FacultyDashboard.test.tsx`      | 🔲 Not Started  |
-| TC-S2-10  | US-12     | Search bar filters assigned students by name (case-insensitive)             | `FacultyDashboard.test.tsx`      | 🔲 Not Started  |
-| TC-S2-11  | US-12     | Search bar filters assigned students by student ID                          | `FacultyDashboard.test.tsx`      | 🔲 Not Started  |
-| TC-S2-12  | US-13     | Selecting a student renders their curriculum map in read-only mode          | `FacultyDashboard.test.tsx`      | 🔲 Not Started  |
-| TC-S2-13  | US-13     | Read-only curriculum map has no interactive or editable checkboxes          | `FacultyDashboard.test.tsx`      | 🔲 Not Started  |
+| TC-S2-07  | US-11     | Faculty dashboard shows only programs with assigned students                | `FacultyDashboard.test.tsx`      | ✅ Pass         |
+| TC-S2-08  | US-11     | Tapping a program reveals only assigned year levels                         | `FacultyDashboard.test.tsx`      | ✅ Pass         |
+| TC-S2-09  | US-11     | Tapping a year level reveals only assigned sections                         | `FacultyDashboard.test.tsx`      | ✅ Pass         |
+| TC-S2-10  | US-12     | Search bar filters assigned students by name (case-insensitive)             | `FacultyDashboard.test.tsx`      | ✅ Pass         |
+| TC-S2-11  | US-12     | Search bar filters assigned students by student ID                          | `FacultyDashboard.test.tsx`      | ✅ Pass         |
+| TC-S2-12  | US-13     | Selecting a student renders their curriculum map in read-only mode          | `FacultyDashboard.test.tsx`      | ✅ Pass         |
+| TC-S2-13  | US-13     | Read-only curriculum map has no interactive or editable checkboxes          | `FacultyDashboard.test.tsx`      | ✅ Pass         |
 
 #### Module C — Admin Bulk Enrollment
 
 | TC ID     | Linked US | Description                                                                 | Test File                        | Status          |
 |-----------|-----------|-----------------------------------------------------------------------------|----------------------------------|-----------------|
-| TC-S2-14  | US-04     | Bulk enrollment form renders with 5 default input rows                      | `BulkEnrollment.test.tsx`        | 🔲 Not Started  |
-| TC-S2-15  | US-04     | "Add Row" button appends a new empty row to the form                        | `BulkEnrollment.test.tsx`        | 🔲 Not Started  |
-| TC-S2-16  | US-04     | Clicking "Confirm Enrollment" shows a confirmation modal before submitting  | `BulkEnrollment.test.tsx`        | 🔲 Not Started  |
-| TC-S2-17  | US-04     | Confirmed enrollment inserts profile and enrollment records into Supabase   | `BulkEnrollment.test.tsx`        | 🔲 Not Started  |
-| TC-S2-18  | US-03     | Soft delete sets `is_deleted = true` without calling Supabase `.delete()`   | `AdminDashboard.test.tsx`        | 🔲 Not Started  |
-| TC-S2-19  | US-03     | A soft-deleted user can be recovered by setting `is_deleted = false`        | `AdminDashboard.test.tsx`        | 🔲 Not Started  |
+| TC-S2-14  | US-04     | Bulk enrollment form renders with 5 default input rows                      | `BulkEnrollment.test.tsx`        | ✅ Pass         |
+| TC-S2-15  | US-04     | "Add Row" button appends a new empty row to the form                        | `BulkEnrollment.test.tsx`        | ✅ Pass         |
+| TC-S2-16  | US-04     | Clicking "Confirm Enrollment" shows a confirmation modal before submitting  | `BulkEnrollment.test.tsx`        | ✅ Pass         |
+| TC-S2-17  | US-04     | Confirmed enrollment inserts profile and enrollment records into Supabase   | `BulkEnrollment.test.tsx`        | ✅ Pass         |
+| TC-S2-18  | US-03     | Soft delete sets `is_deleted = true` without calling Supabase `.delete()`   | `AdminDashboard.test.tsx`        | ✅ Pass         |
+| TC-S2-19  | US-03     | A soft-deleted user can be recovered by setting `is_deleted = false`        | `AdminDashboard.test.tsx`        | ✅ Pass         |
 
 #### Module D — Super Admin Constraints
 
 | TC ID     | Linked US | Description                                                                 | Test File                        | Status          |
 |-----------|-----------|-----------------------------------------------------------------------------|----------------------------------|-----------------|
-| TC-S2-20  | US-01     | Edit and Delete buttons are disabled for reserved Super Admin accounts      | `SuperAdminManagement.test.tsx`  | 🔲 Not Started  |
-| TC-S2-21  | US-01     | Reserved accounts display "System reserved account" tooltip on hover        | `SuperAdminManagement.test.tsx`  | 🔲 Not Started  |
-| TC-S2-22  | US-01     | Non-reserved Admin accounts can be edited and deleted by Super Admin        | `SuperAdminManagement.test.tsx`  | 🔲 Not Started  |
+| TC-S2-20  | US-01     | Edit and Delete buttons are disabled for reserved Super Admin accounts      | `SuperAdminManagement.test.tsx`  | ✅ Pass         |
+| TC-S2-21  | US-01     | Reserved accounts display "System reserved account" tooltip on hover        | `SuperAdminManagement.test.tsx`  | ✅ Pass         |
+| TC-S2-22  | US-01     | Non-reserved Admin accounts can be edited and deleted by Super Admin        | `SuperAdminManagement.test.tsx`  | ✅ Pass         |
 
 **Sprint 2 Total Test Cases:** 22 | **Not Started:** 22 | **Pass:** 0 | **Fail:** 0
 
