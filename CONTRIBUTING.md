@@ -1,3 +1,5 @@
+
+
 # Contributing to Syllabus Curriculum Map
 
 Thank you for contributing to our Knowledge Management project! To maintain a clean and professional codebase, please follow these guidelines.
@@ -7,7 +9,7 @@ Follow these steps to get your local environment set up:
 
 1.  **Clone the Repository:**
     ```bash
-    git clone https://github.com/JLNerecina/PE2-KM-Syllabus-Curriculum-Map.git
+    git clone https://github.com/[your-repo-path].git
     cd [repo-folder-name]
     ```
 2.  **Install Dependencies:**
@@ -64,4 +66,4 @@ Before a PR is merged by the **Project Manager** or **Lead Developer**, it must 
 * **Alignment:** Does it match the **UX Wireframes** and **KM Architecture**?
 * **Approval:** At least one "Approve" vote is required from a peer or lead.
 
-## Thank you for your contribution to our Knowledge Management project!
+---

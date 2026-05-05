@@ -40,4 +40,3 @@ File created by QA & Documentation Lead and Scrum Master.
 * @engr-julia made their first contribution in https://github.com/JLNerecina/PE2-KM-Syllabus-Curriculum-Map/pull/11
 * @BaiSakinaAbad made their first contribution in https://github.com/JLNerecina/PE2-KM-Syllabus-Curriculum-Map/pull/10
 * @EranJosh made their first contribution in https://github.com/JLNerecina/PE2-KM-Syllabus-Curriculum-Map/pull/15
-
