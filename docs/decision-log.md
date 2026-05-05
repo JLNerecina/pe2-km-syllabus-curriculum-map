@@ -19,8 +19,7 @@ Every major team decision is recorded here (as required in guideline Part 2.4).
 |10 | 04/09/2026 | QA & Docs Lead completed CONTRIBUTING.md and CHANGELOG.md | Ad-hoc documentation vs structured guideline-compliant docs | All members | CONTRIBUTING.md and CHANGELOG.md are now in place as required by the guideline. |
 | 11 | 04/15/2026 | Start of Build Sprint 1 (Authentication & Log-in Flow) | Continuing with previous plan vs re-scoping | All members | Officially started Sprint 1. Developer has begun implementing core auth features. |
 | 12 | 04/22/2026 | Major design pivot to new CICS Curriculum Map Specification | NEUVLE-inspired design vs Detailed professor specification | All members | Decided to fully adopt the new detailed specification document provided by the professor. All Sprint 1 work must now follow the new requirements (Google Login restriction, prerequisite logic, role-specific views, bulk enrollment, etc.). |
+| 13 | 05/02/2026 | Core system development completed                  | Continue incremental vs Full system completion | All members           | Decided that the main application (Sprint 1 + Sprint 2) is now functionally complete. Focus shifts to bug fixing, testing, and documentation. |
+| 14 | 05/02/2026 | Bug fixing and QA testing phase                    | Fix bugs before deployment vs Deploy with known issues | All members           | All bugs found by QA will be fixed by Developer before merging to main and deploying to Vercel. |
+| 15 | 05/02/2026 | Final documentation and deployment preparation     | Deploy first then document vs Complete docs before deployment | All members | We will merge dev → main and deploy to Vercel once QA confirms stability, then finalize all remaining documentation. |
 
-**Next major decisions to be logged (already in To Do):**  
-- Final frontend framework confirmation  
-- Vercel hosting configuration  
-- User stories template and BPMN Diagram approval
