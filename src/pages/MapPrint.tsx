@@ -323,7 +323,7 @@ export default function MapPrint() {
                   color: '#1e1b4b',
                 }}
               >
-                {profile?.program_name || 'Curriculum'} Progress Map
+                CICS Curriculum Progress Map
               </div>
               <div style={{ fontSize: '7.5pt', color: '#64748b', marginTop: '1px' }}>
                 Attained Courses Report
