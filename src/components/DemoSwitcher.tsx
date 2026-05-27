@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, resetLocalSandbox } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 
 export const DemoSwitcher = () => {
@@ -32,6 +32,18 @@ export const DemoSwitcher = () => {
       setIsExpanded(false);
     } catch (error) {
       console.error('Failed to swap demo role:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetSandbox = () => {
+    try {
+      setIsLoading(true);
+      resetLocalSandbox();
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to reset sandbox:', error);
     } finally {
       setIsLoading(false);
     }
@@ -84,6 +96,15 @@ export const DemoSwitcher = () => {
 
           <div className="h-px bg-outline-variant/30 my-2"></div>
           
+          <button
+            onClick={handleResetSandbox}
+            disabled={isLoading}
+            className="flex items-center gap-3 px-3 py-2 rounded-xl text-amber-400 hover:bg-amber-500/10 transition-colors text-sm font-label-md w-full mb-1"
+          >
+            <span className="material-symbols-outlined text-xl">restart_alt</span>
+            Reset Sandbox
+          </button>
+
           <button
             onClick={handleExitDemo}
             disabled={isLoading}
