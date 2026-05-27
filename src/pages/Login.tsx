@@ -61,7 +61,23 @@ export default function Login() {
       }
     } catch (err: any) {
       setError(err.message || 'Failed to authenticate with Google');
-    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async (role: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const email = `${role}@demo.com`;
+      const password = 'demoPassword123';
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        throw error;
+      }
+      // Success: AuthContext will handle state change and redirect
+    } catch (err: any) {
+      setError(err.message || `Failed to login as demo ${role}`);
       setIsLoading(false);
     }
   };
@@ -146,6 +162,35 @@ export default function Login() {
                     ? 'Verifying authorization...' 
                     : 'Sign in with Google'}
               </button>
+            </div>
+
+            {/* Demo Mode Section */}
+            <div className="w-full mt-8 pt-6 border-t border-outline-variant/30 relative">
+              <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface-container px-3 text-xs font-label-sm text-on-surface-variant uppercase tracking-wider rounded-full border border-outline-variant/30">
+                Demo Access
+              </span>
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                {[
+                  { role: 'student', icon: 'school', color: 'from-blue-500/20 to-blue-600/20 text-blue-300 border-blue-500/30 hover:border-blue-400' },
+                  { role: 'faculty', icon: 'co_present', color: 'from-emerald-500/20 to-emerald-600/20 text-emerald-300 border-emerald-500/30 hover:border-emerald-400' },
+                  { role: 'admin', icon: 'admin_panel_settings', color: 'from-amber-500/20 to-amber-600/20 text-amber-300 border-amber-500/30 hover:border-amber-400' },
+                  { role: 'superadmin', icon: 'shield_person', color: 'from-purple-500/20 to-purple-600/20 text-purple-300 border-purple-500/30 hover:border-purple-400' }
+                ].map((demo) => (
+                  <button
+                    key={demo.role}
+                    onClick={() => handleDemoLogin(demo.role)}
+                    disabled={isLoading || (user && !profile && isAuthLoading)}
+                    className={`flex flex-col items-center justify-center p-3 rounded-xl border bg-gradient-to-br transition-all duration-300 hover:-translate-y-1 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed group/demo ${demo.color}`}
+                  >
+                    <span className="material-symbols-outlined text-2xl mb-1 group-hover/demo:scale-110 transition-transform">
+                      {demo.icon}
+                    </span>
+                    <span className="font-label-sm text-[10px] uppercase tracking-wide">
+                      {demo.role}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>

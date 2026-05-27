@@ -1,5 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { DemoSwitcher } from '../components/DemoSwitcher';
 
 export const RootLayout = () => {
   const { signOut, profile } = useAuth();
@@ -73,6 +74,9 @@ export const RootLayout = () => {
       <main className="mt-16 flex-1 bg-[#0b1326] min-h-[calc(100vh-64px)] overflow-x-hidden">
         <Outlet />
       </main>
+
+      {/* Demo Switcher Component */}
+      <DemoSwitcher />
     </div>
   );
 };
